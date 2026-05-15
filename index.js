@@ -73,7 +73,7 @@
 
     /** @param {string} text @returns {string} */
     function cleanHangul(text) {
-        return text.replace(RE_HANGUL, '');
+        return text.replace(RE_HANGUL, ' ');
     }
 
     // =========================================================================
