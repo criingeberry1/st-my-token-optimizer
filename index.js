@@ -153,6 +153,48 @@
     }
 
     // =========================================================================
+    //  TOKEN COUNTER
+    // =========================================================================
+
+    /**
+     * Counts tokens in the processed chat using ST's built-in tokenizer,
+     * then updates the UI element. Async — runs after processPrompt returns
+     * so it never blocks the pipeline.
+     *
+     * @param {Array<{role:string, content:string|Array}>} chat
+     */
+    async function updateTokenCount(chat) {
+        const el = document.getElementById('to-token-count');
+        if (!el) return;
+
+        const ctx = SillyTavern.getContext();
+
+        // ST stable exposes getTokenCountAsync; fallback to sync getTokenCount
+        const counter = ctx.getTokenCountAsync || ctx.getTokenCount;
+        if (typeof counter !== 'function') {
+            el.textContent = 'токенизатор недоступен';
+            el.className = 'to-tc-value to-tc-warn';
+            return;
+        }
+
+        try {
+            const fullText = chat
+                .map(m => getText(m.content))
+                .filter(Boolean)
+                .join('\n');
+
+            const count = await Promise.resolve(counter.call(ctx, fullText));
+
+            el.textContent = Number(count).toLocaleString('ru-RU') + ' токенов';
+            el.className = 'to-tc-value';
+        } catch (err) {
+            el.textContent = 'ошибка токенизатора';
+            el.className = 'to-tc-value to-tc-warn';
+            console.warn('[' + DISPLAY_NAME + '] tokenizer error:', err);
+        }
+    }
+
+    // =========================================================================
     //  CORE — prompt interceptor
     // =========================================================================
 
@@ -222,6 +264,9 @@
         for (let i = toRemove.length - 1; i >= 0; i--) {
             chat.splice(toRemove[i], 1);
         }
+
+        // ── Update token counter in UI (non-blocking) ─────────────────────────
+        updateTokenCount(chat);
     }
 
     // =========================================================================
@@ -273,6 +318,13 @@
                         <input id="to-user-count" type="number" class="text_pole to-num-input"
                             value="${s.protected_user_count}" min="1" max="30">
                         <span class="to-sub-label">сообщений юзера</span>
+                    </div>
+
+                    <hr class="to-divider">
+
+                    <div class="to-tc-block">
+                        <span class="to-tc-label">Последний запрос:</span>
+                        <span id="to-token-count" class="to-tc-value">—</span>
                     </div>
 
                     <hr class="to-divider">
