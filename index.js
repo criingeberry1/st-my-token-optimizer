@@ -194,9 +194,12 @@
             const msg  = chat[i];
             let   text = getText(msg.content);
 
-            // 1. Clean U+3164
+            // 1. Clean U+3164 — user messages always, AI messages except the last one
             if (s.clean_hangul) {
-                text = cleanHangul(text);
+                const isLastAi = msg.role === 'assistant' && i === aiIdx[aiIdx.length - 1];
+                if (!isLastAi) {
+                    text = cleanHangul(text);
+                }
             }
 
             // 2. Trim <infoblock> in unprotected AI messages
