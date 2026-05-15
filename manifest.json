@@ -1,0 +1,13 @@
+{
+    "display_name": "Token Optimizer",
+    "loading_order": 1,
+    "requires": [],
+    "optional": [],
+    "js": "index.js",
+    "css": "style.css",
+    "author": "your insomnia & claude",
+    "version": "1.0.0",
+    "description": "Reduces token usage: removes U+3164, trims old <infoblock> to GENERAL STATS only, hides bracket-only timeskips from the API payload.",
+    "homePage": "",
+    "auto_update": false
+}
