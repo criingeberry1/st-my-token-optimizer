@@ -393,11 +393,11 @@
             }
         });
 
-        // Hook into the chat-completion pipeline.
-        // CHAT_COMPLETION_PROMPT_READY fires after messages[] is assembled
-        // but before the HTTP request is sent — we get a mutable reference.
+        // Регистрируем хук СНАРУЖИ APP_READY — если APP_READY уже сработал
+        // к моменту загрузки расширения, вложенная версия никогда не выполнится.
         if (ctx.event_types.CHAT_COMPLETION_PROMPT_READY) {
             ctx.eventSource.on(ctx.event_types.CHAT_COMPLETION_PROMPT_READY, processPrompt);
+            console.log('[' + DISPLAY_NAME + '] prompt hook registered.');
         } else {
             console.warn('[' + DISPLAY_NAME + '] CHAT_COMPLETION_PROMPT_READY not found in this ST build.');
         }
